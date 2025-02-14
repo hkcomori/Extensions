@@ -1,6 +1,8 @@
 parameters:
-	level: 0
-	treatPhpDocTypesAsCertain: false
+	phpVersion:
+		min: 80100	# PHP 8.1
+		max: 80499	# PHP 8.4
+	level: 0	# https://phpstan.org/user-guide/rule-levels
 	fileExtensions:
 		- php
 		- phtml
@@ -10,15 +12,16 @@ parameters:
 	excludePaths:
 		analyse:
 			- ../FreshRSS
-			- third-party/*/vendor/*
+			- third-party/*/vendor/*?
 		analyseAndScan:
-			- .git/
-			- node_modules/
-			- symbolic/
-			- third-party/*/tests/*
-			- tmp/
+			- .git/*?
+			- node_modules/*?
+			- symbolic/*?
+			- third-party/*/tests/*?
+			- tmp/*?
 			- vendor/
 			- xExtension-*
 	dynamicConstantNames:
 		- TYPE_GIT
 	reportMaybesInPropertyPhpDocTypes: false
+	treatPhpDocTypesAsCertain: false
