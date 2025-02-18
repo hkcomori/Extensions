@@ -4,7 +4,7 @@ A FreshRSS extension for sending custom webhooks when new article appears (and m
 
 ## Installation / Usage
 
-Please follow official README: https://github.com/FreshRSS/Extensions?tab=readme-ov-file
+Please follow official README: <https://github.com/FreshRSS/Extensions?tab=readme-ov-file>
 
 ## Documentation
 
@@ -25,7 +25,7 @@ In addition, you can choose whether the matched articles will not be inserted in
 
 ## How it works
 
-```
+```text
 ┌──────────────┐          ┌────────────────────────────────────┐          ┌───────┐
 │              │          │             FreshRSS               │          │       │
 │              │          │                                    │          │ some  │
@@ -57,7 +57,7 @@ In addition, you can choose whether the matched articles will not be inserted in
 
 - for every new article that matches custom criteria new HTTP request will be sent
 
-- see also discussion: https://github.com/FreshRSS/FreshRSS/discussions/6480
+- see also discussion: <https://github.com/FreshRSS/FreshRSS/discussions/6480>
 
 ## ⚠️ Limitations
 
