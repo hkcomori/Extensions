@@ -99,8 +99,8 @@ final class WebhookExtension extends Minz_Extension {
 		/** @var string[] */
 		$patterns = $this->getSystemConfigurationValue("keywords") ?? [];
 		$markAsRead = !is_null($this->getSystemConfigurationValue("mark_as_read"));
-		$logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
-		$this->logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
+		$logsEnabled = (bool) ($this->getSystemConfigurationValue("enable_logging") ?? false);
+		$this->logsEnabled = (bool) ($this->getSystemConfigurationValue("enable_logging") ?? false);
 
 		//-- do check keywords: ---------------------------
 		if (!is_array($patterns)) {
