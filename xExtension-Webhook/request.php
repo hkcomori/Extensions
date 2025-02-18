@@ -100,6 +100,10 @@ function sendReq(
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$response = curl_exec($ch);
 		$info = curl_getinfo($ch);
+		if (!is_array($info)) {
+			LOG_WARN($logEnabled, 'curl_getinfo() failed in ' . __METHOD__);
+			return;
+		}
 
 		// ----------------------[ Check for errors: ]-----------------------------------
 
