@@ -1,5 +1,16 @@
 <?php
 
+/**
+ * Summary of sendReq
+ * @param string $url
+ * @param string $method
+ * @param string $bodyType
+ * @param string $body
+ * @param array<int, string> $headers
+ * @param bool $logEnabled
+ * @param string $additionalLog
+ * @throws Throwable
+ */
 function sendReq(
 	string $url,
 	string $method,
@@ -100,12 +111,24 @@ function sendReq(
 	}
 }
 
+/**
+ * Summary of LOG_WARN
+ * @param bool $logEnabled
+ * @param string $data
+ * @throws Minz_PermissionDeniedException
+ */
 function LOG_WARN(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
 		Minz_Log::warning("[WEBHOOK] " . $data);
 	}
 }
 
+/**
+ * Summary of LOG_ERR
+ * @param bool $logEnabled
+ * @param string $data
+ * @throws Minz_PermissionDeniedException
+ */
 function LOG_ERR(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
 		Minz_Log::error("[WEBHOOK]❌ " . $data);

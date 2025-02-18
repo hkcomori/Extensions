@@ -72,8 +72,8 @@ final class WebhookExtension extends Minz_Extension {
 
 			_LOG($this->logsEnabled, "saved config: ✅ " . json_encode($conf));
 
-			try {
-				if (Minz_Request::paramString("test_request") !== "") {
+			if (Minz_Request::paramString("test_request") !== "") {
+				try {
 					sendReq(
 						$conf["webhook_url"],
 						$conf["webhook_method"],
@@ -82,9 +82,9 @@ final class WebhookExtension extends Minz_Extension {
 						$conf["webhook_headers"],
 						$conf["enable_logging"],
 					);
+				} catch (Throwable $err) {
+					_LOG_ERR($this->logsEnabled, "Error when sending TEST webhook. " . $err);
 				}
-			} catch (Throwable $err) {
-				_LOG_ERR($this->logsEnabled, "Error when sending TEST webhook. " . $err);
 			}
 		}
 	}
@@ -116,59 +116,55 @@ final class WebhookExtension extends Minz_Extension {
 		$link = "❗️NOT INITIALIZED";
 		$additionalLog = "";
 
-		try {
-			$title = $entry->title();
-			$link = $entry->link();
-			foreach ($patterns as $pattern) {
-				if ($searchInTitle && self::isPatternFound("/{$pattern}/", $title)) {
-					_LOG($logsEnabled, "matched item by title ✔️ \"{$title}\" ❖ link: {$link}");
-					$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ title \"{$title}\" ❖ link: {$link}";
-					break;
-				}
-				if ($searchInFeed && (is_object($entry->feed()) && self::isPatternFound("/{$pattern}/", $entry->feed()->name()))) {
-					_LOG($logsEnabled, "matched item with pattern: /{$pattern}/ ❖ feed \"{$entry->feed()->name()}\", (title: \"{$title}\") ❖ link: {$link}");
-					$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ feed \"{$entry->feed()->name()}\", (title: \"{$title}\") ❖ link: {$link}";
-					break;
-				}
-				if ($searchInAuthors && self::isPatternFound("/{$pattern}/", $entry->authors(true))) {
-					_LOG($logsEnabled, "✔️ matched item with pattern: /{$pattern}/ ❖ authors \"{$entry->authors(true)}\", (title: {$title}) ❖ link: {$link}");
-					$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ authors \"{$entry->authors(true)}\", (title: {$title}) ❖ link: {$link}";
-					break;
-				}
-				if ($searchInContent && self::isPatternFound("/{$pattern}/", $entry->content())) {
-					_LOG($logsEnabled, "✔️ matched item with pattern: /{$pattern}/ ❖ content (title: \"{$title}\") ❖ link: {$link}");
-					$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ content (title: \"{$title}\") ❖ link: {$link}";
-					break;
-				}
+		$title = $entry->title();
+		$link = $entry->link();
+		foreach ($patterns as $pattern) {
+			if ($searchInTitle && self::isPatternFound("/{$pattern}/", $title)) {
+				_LOG($logsEnabled, "matched item by title ✔️ \"{$title}\" ❖ link: {$link}");
+				$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ title \"{$title}\" ❖ link: {$link}";
+				break;
 			}
-
-			if ($markAsRead) {
-				$entry->_isRead($markAsRead);
+			if ($searchInFeed && (is_object($entry->feed()) && self::isPatternFound("/{$pattern}/", $entry->feed()->name()))) {
+				_LOG($logsEnabled, "matched item with pattern: /{$pattern}/ ❖ feed \"{$entry->feed()->name()}\", (title: \"{$title}\") ❖ link: {$link}");
+				$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ feed \"{$entry->feed()->name()}\", (title: \"{$title}\") ❖ link: {$link}";
+				break;
 			}
-
-			$this->sendArticle($entry, $additionalLog);
-		} catch (Throwable $err) {
-			_LOG_ERR($logsEnabled, "Error during sending article ({$link} ❖ \"{$title}\") ERROR: {$err}");
+			if ($searchInAuthors && self::isPatternFound("/{$pattern}/", $entry->authors(true))) {
+				_LOG($logsEnabled, "✔️ matched item with pattern: /{$pattern}/ ❖ authors \"{$entry->authors(true)}\", (title: {$title}) ❖ link: {$link}");
+				$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ authors \"{$entry->authors(true)}\", (title: {$title}) ❖ link: {$link}";
+				break;
+			}
+			if ($searchInContent && self::isPatternFound("/{$pattern}/", $entry->content())) {
+				_LOG($logsEnabled, "✔️ matched item with pattern: /{$pattern}/ ❖ content (title: \"{$title}\") ❖ link: {$link}");
+				$additionalLog = "✔️ matched item with pattern: /{$pattern}/ ❖ content (title: \"{$title}\") ❖ link: {$link}";
+				break;
+			}
 		}
+
+		if ($markAsRead) {
+			$entry->_isRead($markAsRead);
+		}
+
+		$this->sendArticle($entry, $additionalLog);
 
 		return $entry;
 	}
 
 	private function sendArticle(FreshRSS_Entry $entry, string $additionalLog = ""): void {
+		$webhookBodyType = $this->getSystemConfigurationValue("webhook_body_type");
+		$headers = $this->getSystemConfigurationValue("webhook_headers");
+		$bodyStr = $this->getSystemConfigurationValue("webhook_body");
+
+		$bodyStr = str_replace("__TITLE__", self::toSafeJsonStr($entry->title()), $bodyStr);
+		$bodyStr = str_replace("__FEED__", self::toSafeJsonStr($entry->feed()->name()), $bodyStr);
+		$bodyStr = str_replace("__URL__", self::toSafeJsonStr($entry->link()), $bodyStr);
+		$bodyStr = str_replace("__CONTENT__", self::toSafeJsonStr($entry->content()), $bodyStr);
+		$bodyStr = str_replace("__DATE__", self::toSafeJsonStr($entry->date()), $bodyStr);
+		$bodyStr = str_replace("__DATE_TIMESTAMP__", self::toSafeJsonStr($entry->date(true)), $bodyStr);
+		$bodyStr = str_replace("__AUTHORS__", self::toSafeJsonStr($entry->authors(true)), $bodyStr);
+		$bodyStr = str_replace("__TAGS__", self::toSafeJsonStr($entry->tags(true)), $bodyStr);
+
 		try {
-			$webhookBodyType = $this->getSystemConfigurationValue("webhook_body_type");
-			$headers = $this->getSystemConfigurationValue("webhook_headers");
-			$bodyStr = $this->getSystemConfigurationValue("webhook_body");
-
-			$bodyStr = str_replace("__TITLE__", self::toSafeJsonStr($entry->title()), $bodyStr);
-			$bodyStr = str_replace("__FEED__", self::toSafeJsonStr($entry->feed()->name()), $bodyStr);
-			$bodyStr = str_replace("__URL__", self::toSafeJsonStr($entry->link()), $bodyStr);
-			$bodyStr = str_replace("__CONTENT__", self::toSafeJsonStr($entry->content()), $bodyStr);
-			$bodyStr = str_replace("__DATE__", self::toSafeJsonStr($entry->date()), $bodyStr);
-			$bodyStr = str_replace("__DATE_TIMESTAMP__", self::toSafeJsonStr($entry->date(true)), $bodyStr);
-			$bodyStr = str_replace("__AUTHORS__", self::toSafeJsonStr($entry->authors(true)), $bodyStr);
-			$bodyStr = str_replace("__TAGS__", self::toSafeJsonStr($entry->tags(true)), $bodyStr);
-
 			sendReq(
 				$this->getSystemConfigurationValue("webhook_url"),
 				$this->getSystemConfigurationValue("webhook_method"),
@@ -198,17 +194,12 @@ final class WebhookExtension extends Minz_Extension {
 		if (empty($text) || empty($pattern)) {
 			return false;
 		}
-		try {
-			if (1 === preg_match($pattern, $text)) {
-				return true;
-			} elseif (strpos($text, $pattern) !== false) {
-				return true;
-			}
-			return false;
-		} catch (Throwable $err) {
-			_LOG_ERR($this->logsEnabled, "ERROR in isPatternFound: (pattern: {$pattern}) {$err}");
-			return false;
+		if (1 === preg_match($pattern, $text)) {
+			return true;
+		} elseif (strpos($text, $pattern) !== false) {
+			return true;
 		}
+		return false;
 	}
 
 	public function getKeywordsData(): string {
@@ -247,12 +238,20 @@ final class WebhookExtension extends Minz_Extension {
 
 function _LOG(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
-		Minz_Log::warning("[WEBHOOK] " . $data);
+		try {
+			Minz_Log::warning("[WEBHOOK] " . $data);
+		} catch (Minz_PermissionDeniedException) {
+			// Ignore this exception
+		}
 	}
 }
 
 function _LOG_ERR(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
-		Minz_Log::error("[WEBHOOK] ❌ " . $data);
+		try {
+			Minz_Log::error("[WEBHOOK] ❌ " . $data);
+		} catch (Minz_PermissionDeniedException) {
+			// Ignore this exception
+		}
 	}
 }
