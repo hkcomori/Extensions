@@ -19,7 +19,7 @@ enum HTTP_METHOD: string {
 	case HEAD = "HEAD";
 }
 
-class WebhookExtension extends Minz_Extension {
+final class WebhookExtension extends Minz_Extension {
 	public bool $logsEnabled = false;
 
 	public HTTP_METHOD $webhook_method = HTTP_METHOD::POST;
@@ -42,6 +42,7 @@ class WebhookExtension extends Minz_Extension {
 		$this->registerHook("entry_before_insert", [$this, "processArticle"]);
 	}
 
+	#[\Override]
 	public function handleConfigureAction(): void {
 		$this->registerTranslates();
 
