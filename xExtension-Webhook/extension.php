@@ -27,8 +27,8 @@ final class WebhookExtension extends Minz_Extension {
 
 	public string $webhook_url = "http://<WRITE YOUR URL HERE>";
 
-	/** * @var string[] $webhook_headers as array of strings */
-	public array $webhook_headers = ["User-Agent: FreshRSS", "Content-Type: application/x-www-form-urlencoded"];
+	/** @var string[] */
+	public $webhook_headers = ["User-Agent: FreshRSS", "Content-Type: application/x-www-form-urlencoded"];
 	public string $webhook_body = '{
 	"title": "__TITLE__",
 	"feed": "__FEED__",
@@ -48,7 +48,7 @@ final class WebhookExtension extends Minz_Extension {
 
 		if (Minz_Request::isPost()) {
 			$conf = [
-				"keywords" => array_filter(Minz_Request::paramTextToArray("keywords", [])),
+				"keywords" => array_filter(Minz_Request::paramTextToArray("keywords", false)),
 				"search_in_title" => Minz_Request::paramString("search_in_title"),
 				"search_in_feed" => Minz_Request::paramString("search_in_feed"),
 				"search_in_authors" => Minz_Request::paramString("search_in_authors"),
@@ -58,7 +58,7 @@ final class WebhookExtension extends Minz_Extension {
 
 				"webhook_url" => Minz_Request::paramString("webhook_url"),
 				"webhook_method" => Minz_Request::paramString("webhook_method"),
-				"webhook_headers" => array_filter(Minz_Request::paramTextToArray("webhook_headers", [])),
+				"webhook_headers" => array_filter(Minz_Request::paramTextToArray("webhook_headers", false)),
 				"webhook_body" => html_entity_decode(Minz_Request::paramString("webhook_body")),
 				"webhook_body_type" => Minz_Request::paramString("webhook_body_type"),
 				"enable_logging" => (bool) Minz_Request::paramString("enable_logging"),
@@ -69,7 +69,7 @@ final class WebhookExtension extends Minz_Extension {
 			_LOG($this->$logsEnabled, "saved config: ✅ " . json_encode($conf));
 
 			try {
-				if (Minz_Request::paramString("test_request")) {
+				if (Minz_Request::paramString("test_request") !== "") {
 					sendReq(
 						$conf["webhook_url"],
 						$conf["webhook_method"],
@@ -85,10 +85,7 @@ final class WebhookExtension extends Minz_Extension {
 		}
 	}
 
-	public function processArticle($entry) {
-		if (!is_object($entry)) {
-			return;
-		}
+	public function processArticle(FreshRSS_Entry $entry): mixed {
 		if ($this->getSystemConfigurationValue("ignore_updated") && $entry->isUpdated()) {
 			_LOG(true, "⚠️ ignore_updated: " . $entry->link() . " ♦♦ " . $entry->title());
 			return $entry;
@@ -99,6 +96,7 @@ final class WebhookExtension extends Minz_Extension {
 		$searchInAuthors = $this->getSystemConfigurationValue("search_in_authors") ?? false;
 		$searchInContent = $this->getSystemConfigurationValue("search_in_content") ?? false;
 
+		/** @var string[] */
 		$patterns = $this->getSystemConfigurationValue("keywords") ?? [];
 		$markAsRead = $this->getSystemConfigurationValue("mark_as_read") ?? false;
 		$logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
@@ -107,7 +105,7 @@ final class WebhookExtension extends Minz_Extension {
 		//-- do check keywords: ---------------------------
 		if (!is_array($patterns)) {
 			_LOG_ERR($logsEnabled, "❗️ No keywords defined in Webhook extension settings.");
-			return;
+			return null;
 		}
 
 		$title = "❗️NOT INITIALIZED";
