@@ -208,27 +208,27 @@ final class WebhookExtension extends Minz_Extension {
 		}
 	}
 
-	public function getKeywordsData() {
+	public function getKeywordsData(): string {
 		return implode(PHP_EOL, $this->getSystemConfigurationValue("keywords") ?? []);
 	}
 
-	public function getWebhookHeaders() {
+	public function getWebhookHeaders(): string {
 		return implode(
 			PHP_EOL,
 			$this->getSystemConfigurationValue("webhook_headers") ?? ($this->webhook_headers ?? []),
 		);
 	}
 
-	public function getWebhookUrl() {
+	public function getWebhookUrl(): string {
 		return $this->getSystemConfigurationValue("webhook_url") ?? $this->webhook_url;
 	}
 
-	public function getWebhookBody() {
+	public function getWebhookBody(): string {
 		$body = $this->getSystemConfigurationValue("webhook_body");
 		return !$body || $body === "" ? $this->webhook_body : $body;
 	}
 
-	public function getWebhookBodyType() {
+	public function getWebhookBodyType(): string {
 		return $this->getSystemConfigurationValue("webhook_body_type") ?? $this->webhook_body_type;
 	}
 }
