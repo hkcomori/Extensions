@@ -48,7 +48,9 @@ final class WebhookExtension extends Minz_Extension {
 
 		if (Minz_Request::isPost()) {
 			$conf = [
-				"keywords" => array_filter(Minz_Request::paramTextToArray("keywords", false)),
+				"keywords" => array_filter(Minz_Request::paramTextToArray("keywords", false), function (string $keyword) {
+					return empty($keyword);
+				}),
 				"search_in_title" => Minz_Request::paramString("search_in_title"),
 				"search_in_feed" => Minz_Request::paramString("search_in_feed"),
 				"search_in_authors" => Minz_Request::paramString("search_in_authors"),
@@ -58,7 +60,9 @@ final class WebhookExtension extends Minz_Extension {
 
 				"webhook_url" => Minz_Request::paramString("webhook_url"),
 				"webhook_method" => Minz_Request::paramString("webhook_method"),
-				"webhook_headers" => array_filter(Minz_Request::paramTextToArray("webhook_headers", false)),
+				"webhook_headers" => array_filter(Minz_Request::paramTextToArray("webhook_headers", false), function (string $keyword) {
+					return empty($keyword);
+				}),
 				"webhook_body" => html_entity_decode(Minz_Request::paramString("webhook_body")),
 				"webhook_body_type" => Minz_Request::paramString("webhook_body_type"),
 				"enable_logging" => (bool) Minz_Request::paramString("enable_logging"),
