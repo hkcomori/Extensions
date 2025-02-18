@@ -151,12 +151,13 @@ final class WebhookExtension extends Minz_Extension {
 	}
 
 	private function sendArticle(FreshRSS_Entry $entry, string $additionalLog = ""): void {
-		$webhookBodyType = $this->getSystemConfigurationValue("webhook_body_type");
-		$headers = $this->getSystemConfigurationValue("webhook_headers");
-		$bodyStr = $this->getSystemConfigurationValue("webhook_body");
+		$feed = $entry->feed() ?? FreshRSS_Feed::default();
+
+		/** @var string */
+		$bodyStr = $this->getSystemConfigurationValue("webhook_body") ?? "";
 
 		$bodyStr = str_replace("__TITLE__", self::toSafeJsonStr($entry->title()), $bodyStr);
-		$bodyStr = str_replace("__FEED__", self::toSafeJsonStr($entry->feed()->name()), $bodyStr);
+		$bodyStr = str_replace("__FEED__", self::toSafeJsonStr($feed->name()), $bodyStr);
 		$bodyStr = str_replace("__URL__", self::toSafeJsonStr($entry->link()), $bodyStr);
 		$bodyStr = str_replace("__CONTENT__", self::toSafeJsonStr($entry->content()), $bodyStr);
 		$bodyStr = str_replace("__DATE__", self::toSafeJsonStr($entry->date()), $bodyStr);
@@ -164,14 +165,24 @@ final class WebhookExtension extends Minz_Extension {
 		$bodyStr = str_replace("__AUTHORS__", self::toSafeJsonStr($entry->authors(true)), $bodyStr);
 		$bodyStr = str_replace("__TAGS__", self::toSafeJsonStr($entry->tags(true)), $bodyStr);
 
+		/** @var string */
+		$url = $this->getSystemConfigurationValue("webhook_url") ?? "";
+		/** @var string */
+		$method = $this->getSystemConfigurationValue("webhook_method") ?? "";
+		/** @var string */
+		$body_type = $this->getSystemConfigurationValue("webhook_body_type") ?? "";
+		/** @var array<int, string> */
+		$headers = $this->getSystemConfigurationValue("webhook_headers") ?? [];
+		$enable_logging = (bool) ($this->getSystemConfigurationValue("enable_logging") ?? false);
+
 		try {
 			sendReq(
-				$this->getSystemConfigurationValue("webhook_url"),
-				$this->getSystemConfigurationValue("webhook_method"),
-				$this->getSystemConfigurationValue("webhook_body_type"),
+				$url,
+				$method,
+				$body_type,
 				$bodyStr,
-				$this->getSystemConfigurationValue("webhook_headers"),
-				(bool) $this->getSystemConfigurationValue("enable_logging"),
+				$headers,
+				$enable_logging,
 				$additionalLog,
 			);
 		} catch (Throwable $err) {

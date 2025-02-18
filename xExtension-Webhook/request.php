@@ -42,21 +42,27 @@ function sendReq(
 
 		// ----------------------[ HTTP Body: ]-----------------------------------
 
-		$bodyObject = null;
-		$bodyToSend = null;
+		/** @var string */
+		$bodyToSend = "";
 		try {
 			// $bodyObject = json_decode(json_encode($body ?? ""), true, 64, JSON_THROW_ON_ERROR);
-			$bodyObject = json_decode(($body ?? "{}"), true, 256, JSON_THROW_ON_ERROR);
+			$bodyObject = json_decode(($body), true, 256, JSON_THROW_ON_ERROR);
 
 			// LOG_WARN($logEnabled, "bodyObject: " . json_encode($bodyObject));
 
-			if ($bodyType === "json") {
+			if ($bodyType === "json" && !is_null($bodyObject) && is_object(($bodyObject))) {
 				$bodyToSend = json_encode($bodyObject);
+				if (!is_string($bodyToSend)) {
+					LOG_ERR($logEnabled, "ERROR during parsing HTTP Body, json encode failed | Body: {$body}");
+					return;
+				}
 				// LOG_WARN($logEnabled, "> json_encode ⏩: {$bodyToSend}");
-			}
-			if ($bodyType === "form") {
+			} else if ($bodyType === "form" && (is_array($bodyObject) || is_object(($bodyObject)))) {
 				$bodyToSend = http_build_query($bodyObject);
 				// LOG_WARN($logEnabled, "> http_build_query ⏩: " . $body);
+			} else {
+				LOG_ERR($logEnabled, "ERROR during parsing HTTP Body, type mismatch | BodyType: {$bodyType}, Body: {$body}");
+				return;
 			}
 
 			if (!empty($body) && $method !== "GET") {
@@ -101,7 +107,7 @@ function sendReq(
 			$error = curl_error($ch);
 			LOG_ERR($logEnabled, "< ERROR: " . $error);
 		} else {
-			LOG_WARN($logEnabled, "< Response ✅ (" . $info["http_code"] . ") response:" . $response);
+			LOG_WARN($logEnabled, "< Response ✅ (" . strval($info["http_code"]) . ") response:" . $response);
 		}
 	} catch (Throwable $err) {
 		LOG_ERR($logEnabled, "< ERROR in sendReq: " . $err . " ♦♦ body: {$body} ♦♦");
