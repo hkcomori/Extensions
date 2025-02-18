@@ -35,22 +35,22 @@ declare(strict_types=1);
 						<tr>
 							<td class="group">
 								<input type="checkbox" name="search_in_title" id="search_in_title" value="1"
-									<?= $this->getSystemConfigurationValue('search_in_title') ? 'checked' : '' ?>>
+									<?= !is_null($this->getSystemConfigurationValue('search_in_title')) ? 'checked' : '' ?>>
 								<label for="search_in_title"><b>🪧 title * </b>&nbsp; </label>
 							</td>
 							<td class="group">
 								<input type="checkbox" name="search_in_feed" id="search_in_feed" value="1"
-									<?= $this->getSystemConfigurationValue('search_in_feed') ? 'checked' : '' ?>>
+									<?= !is_null($this->getSystemConfigurationValue('search_in_feed')) ? 'checked' : '' ?>>
 								<label for="search_in_feed">💼 feed &nbsp;</label>
 							</td>
 							<td class="group">
 								<input type="checkbox" name="search_in_authors" id="search_in_authors" value="1"
-									<?= $this->getSystemConfigurationValue('search_in_authors') ? 'checked' : '' ?>>
+									<?= !is_null($this->getSystemConfigurationValue('search_in_authors')) ? 'checked' : '' ?>>
 								<label for="search_in_authors">👥 authors &nbsp;</label>
 							</td>
 							<td class="group">
 								<input type="checkbox" name="search_in_content" id="search_in_content" value="1"
-									<?= $this->getSystemConfigurationValue('search_in_content') ? 'checked' : '' ?>>
+									<?= !is_null($this->getSystemConfigurationValue('search_in_content')) ? 'checked' : '' ?>>
 								<label for="search_in_content">📄 content &nbsp;</label>
 							</td>
 						</tr>
@@ -62,7 +62,7 @@ declare(strict_types=1);
 				<label class="group-name" for="mark_as_read"><?= _t('ext.webhook.mark_as_read') ?></label>
 				<div class="group-controls">
 					<input type="checkbox" name="mark_as_read" id="mark_as_read" value="1"
-						<?= $this->getSystemConfigurationValue('mark_as_read') ? 'checked' : '' ?>>
+						<?= !is_null($this->getSystemConfigurationValue('mark_as_read')) ? 'checked' : '' ?>>
 				</div>
 			</div>
 

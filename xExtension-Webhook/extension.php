@@ -86,19 +86,19 @@ final class WebhookExtension extends Minz_Extension {
 	}
 
 	public function processArticle(FreshRSS_Entry $entry): mixed {
-		if ($this->getSystemConfigurationValue("ignore_updated") && $entry->isUpdated()) {
+		if (!is_null($this->getSystemConfigurationValue("ignore_updated")) && $entry->isUpdated()) {
 			_LOG(true, "⚠️ ignore_updated: " . $entry->link() . " ♦♦ " . $entry->title());
 			return $entry;
 		}
 
-		$searchInTitle = $this->getSystemConfigurationValue("search_in_title") ?? false;
-		$searchInFeed = $this->getSystemConfigurationValue("search_in_feed") ?? false;
-		$searchInAuthors = $this->getSystemConfigurationValue("search_in_authors") ?? false;
-		$searchInContent = $this->getSystemConfigurationValue("search_in_content") ?? false;
+		$searchInTitle = !is_null($this->getSystemConfigurationValue("search_in_title"));
+		$searchInFeed = !is_null($this->getSystemConfigurationValue("search_in_feed"));
+		$searchInAuthors = !is_null($this->getSystemConfigurationValue("search_in_authors"));
+		$searchInContent = !is_null($this->getSystemConfigurationValue("search_in_content"));
 
 		/** @var string[] */
 		$patterns = $this->getSystemConfigurationValue("keywords") ?? [];
-		$markAsRead = $this->getSystemConfigurationValue("mark_as_read") ?? false;
+		$markAsRead = !is_null($this->getSystemConfigurationValue("mark_as_read"));
 		$logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
 		$this->logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
 
@@ -223,7 +223,7 @@ final class WebhookExtension extends Minz_Extension {
 
 	public function getWebhookBody(): string {
 		$body = $this->getSystemConfigurationValue("webhook_body");
-		return !$body || $body === "" ? $this->webhook_body : $body;
+		return is_null($body) || $body === "" ? $this->webhook_body : $body;
 	}
 
 	public function getWebhookBodyType(): string {
