@@ -64,9 +64,9 @@ final class WebhookExtension extends Minz_Extension {
 				"enable_logging" => (bool) Minz_Request::paramString("enable_logging"),
 			];
 			$this->setSystemConfiguration($conf);
-			$this->$logsEnabled = $conf["enable_logging"];
+			$this->logsEnabled = $conf["enable_logging"];
 
-			_LOG($this->$logsEnabled, "saved config: ✅ " . json_encode($conf));
+			_LOG($this->logsEnabled, "saved config: ✅ " . json_encode($conf));
 
 			try {
 				if (Minz_Request::paramString("test_request") !== "") {
@@ -80,7 +80,7 @@ final class WebhookExtension extends Minz_Extension {
 					);
 				}
 			} catch (Throwable $err) {
-				_LOG_ERR($this->$logsEnabled, "Error when sending TEST webhook. " . $err);
+				_LOG_ERR($this->logsEnabled, "Error when sending TEST webhook. " . $err);
 			}
 		}
 	}
@@ -100,7 +100,7 @@ final class WebhookExtension extends Minz_Extension {
 		$patterns = $this->getSystemConfigurationValue("keywords") ?? [];
 		$markAsRead = $this->getSystemConfigurationValue("mark_as_read") ?? false;
 		$logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
-		$this->$logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
+		$this->logsEnabled = (bool) $this->getSystemConfigurationValue("enable_logging") ?? false;
 
 		//-- do check keywords: ---------------------------
 		if (!is_array($patterns)) {
@@ -175,7 +175,7 @@ final class WebhookExtension extends Minz_Extension {
 				$additionalLog,
 			);
 		} catch (Throwable $err) {
-			_LOG_ERR($this->$logsEnabled, "ERROR in sendArticle: {$err}");
+			_LOG_ERR($this->logsEnabled, "ERROR in sendArticle: {$err}");
 		}
 	}
 
@@ -201,7 +201,7 @@ final class WebhookExtension extends Minz_Extension {
 			}
 			return false;
 		} catch (Throwable $err) {
-			_LOG_ERR($this->$logsEnabled, "ERROR in isPatternFound: (pattern: {$pattern}) {$err}");
+			_LOG_ERR($this->logsEnabled, "ERROR in isPatternFound: (pattern: {$pattern}) {$err}");
 			return false;
 		}
 	}
