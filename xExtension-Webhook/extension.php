@@ -154,7 +154,7 @@ final class WebhookExtension extends Minz_Extension {
 		return $entry;
 	}
 
-	private function sendArticle($entry, string $additionalLog = ""): void {
+	private function sendArticle(FreshRSS_Entry $entry, string $additionalLog = ""): void {
 		try {
 			$webhookBodyType = $this->getSystemConfigurationValue("webhook_body_type");
 			$headers = $this->getSystemConfigurationValue("webhook_headers");
@@ -184,7 +184,8 @@ final class WebhookExtension extends Minz_Extension {
 	}
 
 	private function toSafeJsonStr(string|int $str): string {
-		$output = $str;
+		/** @var string */
+		$output = "";
 		if (is_numeric($str)) {
 			$output = "{$str}";
 		} else {
@@ -211,37 +212,46 @@ final class WebhookExtension extends Minz_Extension {
 	}
 
 	public function getKeywordsData(): string {
-		return implode(PHP_EOL, $this->getSystemConfigurationValue("keywords") ?? []);
+		/** @var string[] */
+		$keywords = $this->getSystemConfigurationValue("keywords") ?? [];
+		return implode(PHP_EOL, $keywords);
 	}
 
 	public function getWebhookHeaders(): string {
+		/** @var string[] */
+		$headers = $this->getSystemConfigurationValue("webhook_headers") ?? $this->webhook_headers;
 		return implode(
 			PHP_EOL,
-			$this->getSystemConfigurationValue("webhook_headers") ?? ($this->webhook_headers ?? []),
+			$headers,
 		);
 	}
 
 	public function getWebhookUrl(): string {
-		return $this->getSystemConfigurationValue("webhook_url") ?? $this->webhook_url;
+		/** @var string */
+		$url = $this->getSystemConfigurationValue("webhook_url") ?? $this->webhook_url;
+		return $url;
 	}
 
 	public function getWebhookBody(): string {
+		/** @var string|null */
 		$body = $this->getSystemConfigurationValue("webhook_body");
 		return is_null($body) || $body === "" ? $this->webhook_body : $body;
 	}
 
 	public function getWebhookBodyType(): string {
-		return $this->getSystemConfigurationValue("webhook_body_type") ?? $this->webhook_body_type;
+		/** @var string */
+		$body_type = $this->getSystemConfigurationValue("webhook_body_type") ?? $this->webhook_body_type;
+		return $body_type;
 	}
 }
 
-function _LOG(bool $logEnabled, $data): void {
+function _LOG(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
 		Minz_Log::warning("[WEBHOOK] " . $data);
 	}
 }
 
-function _LOG_ERR(bool $logEnabled, $data): void {
+function _LOG_ERR(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
 		Minz_Log::error("[WEBHOOK] ❌ " . $data);
 	}

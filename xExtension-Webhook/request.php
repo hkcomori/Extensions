@@ -100,13 +100,13 @@ function sendReq(
 	}
 }
 
-function LOG_WARN(bool $logEnabled, $data): void {
+function LOG_WARN(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
 		Minz_Log::warning("[WEBHOOK] " . $data);
 	}
 }
 
-function LOG_ERR(bool $logEnabled, $data): void {
+function LOG_ERR(bool $logEnabled, string $data): void {
 	if ($logEnabled) {
 		Minz_Log::error("[WEBHOOK]❌ " . $data);
 	}
