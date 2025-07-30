@@ -156,6 +156,17 @@
             "directory": "xExtension-FixedNavMenu"
         },
         {
+            "name": "Form Captcha",
+            "author": "Inverle",
+            "description": "Protect register/login forms with captcha",
+            "version": "1.0.0",
+            "entrypoint": "Captcha",
+            "type": "system",
+            "url": "https://github.com/FreshRSS/Extensions",
+            "method": "git",
+            "directory": "xExtension-Captcha"
+        },
+        {
             "name": "FreshRss FlareSolverr",
             "author": "James Ravenscroft",
             "description": "Use a Flaresolverr instance to bypass cloudflare security checks",
