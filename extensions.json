@@ -554,6 +554,18 @@
             "directory": "."
         },
         {
+            "name": "Webhook",
+            "author": "Lukas Melega, Ryahn",
+            "description": "Send custom webhook when new article appears (and matches custom criteria)",
+            "version": "0.2.0",
+            "entrypoint": "Webhook",
+            "type": "user",
+            "compatibility": "1.28.2",
+            "url": "https://github.com/FreshRSS/Extensions",
+            "method": "git",
+            "directory": "xExtension-Webhook"
+        },
+        {
             "name": "White List",
             "author": "Alexis Degrugillier",
             "description": "White list the accessible feeds to users",
