@@ -2,17 +2,6 @@
     "version": 0.1,
     "extensions": [
         {
-            "name": "Always togglable menu",
-            "author": "nicofrand",
-            "description": "This makes the icon to toggle the menu always shown, even on larger screens.",
-            "version": "1.2",
-            "entrypoint": "TogglableMenu",
-            "type": "user",
-            "url": "https://framagit.org/nicofrand/xextension-togglablemenu",
-            "method": "git",
-            "directory": "."
-        },
-        {
             "name": "ArticleSummary",
             "author": "Liang",
             "description": "Generate article summaries using OpenAI-compatible language model APIs. Supports both OpenAI and Ollama providers with a user-friendly configuration interface.",
