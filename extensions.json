@@ -425,7 +425,7 @@
             "name": "Share By Email",
             "author": "Marien Fressinaud",
             "description": "Improve the sharing by email system.",
-            "version": "0.3.6",
+            "version": "0.4.0",
             "entrypoint": "ShareByEmail",
             "type": "user",
             "url": "https://github.com/FreshRSS/Extensions",
